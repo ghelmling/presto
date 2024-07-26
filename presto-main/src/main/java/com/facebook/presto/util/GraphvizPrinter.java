@@ -42,6 +42,7 @@ import com.facebook.presto.sql.planner.optimizations.JoinNodeUtils;
 import com.facebook.presto.sql.planner.plan.AbstractJoinNode;
 import com.facebook.presto.sql.planner.plan.ApplyNode;
 import com.facebook.presto.sql.planner.plan.AssignUniqueId;
+import com.facebook.presto.sql.planner.plan.DeleteNode;
 import com.facebook.presto.sql.planner.plan.EnforceSingleRowNode;
 import com.facebook.presto.sql.planner.plan.ExchangeNode;
 import com.facebook.presto.sql.planner.plan.ExplainAnalyzeNode;
@@ -123,6 +124,7 @@ public final class GraphvizPrinter
         TABLE_WRITER_MERGE,
         TABLE_FINISH,
         METADATA_DELETE,
+        DELETE,
         INDEX_SOURCE,
         UNNEST,
         ANALYZE_FINISH,
@@ -151,6 +153,7 @@ public final class GraphvizPrinter
             .put(NodeType.TABLE_WRITER_MERGE, "cyan4")
             .put(NodeType.TABLE_FINISH, "hotpink")
             .put(NodeType.METADATA_DELETE, "garnet")
+            .put(NodeType.DELETE, "firebrick")
             .put(NodeType.INDEX_SOURCE, "dodgerblue3")
             .put(NodeType.UNNEST, "crimson")
             .put(NodeType.SAMPLE, "goldenrod4")
@@ -327,6 +330,13 @@ public final class GraphvizPrinter
         {
             printNode(node, format("MetadataDeleteNode[%s]", Joiner.on(", ").join(node.getOutputVariables())), NODE_COLORS.get(NodeType.METADATA_DELETE));
             return null;
+        }
+
+        @Override
+        public Void visitDelete(DeleteNode node, Void context)
+        {
+            printNode(node, format("DeleteNode[%s]", Joiner.on(", ").join(node.getOutputVariables())), NODE_COLORS.get(NodeType.DELETE));
+            return node.getSource().accept(this, context);
         }
 
         @Override
